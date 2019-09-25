@@ -32,6 +32,7 @@ function modifyElement(id, data) {
     if (data !== 'VISIBLE' && data !== 'HIDDEN') {
         newElement.setAttribute('data-data', 'VISIBLE');
         GM.setValue(id, 'VISIBLE').then();
+        data = 'VISIBLE';
 
     } else {
         newElement.setAttribute('data-data', data);
