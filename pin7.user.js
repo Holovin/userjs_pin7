@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Pin7Marker
 // @namespace    http://holov.in/Pin7Marker
-// @version      0.1
+// @version      0.2
 // @description  Userjs for mark viewed rows
 // @author       Alexander Holovin
-// @match        http://pin7.ru/search*
+// @match        http://pin7.ru/*
 // @grant        GM.setValue
 // @grant        GM.getValue
 // ==/UserScript==
@@ -19,30 +19,32 @@
 
     rows.forEach(element => {
         const id = element.id;
-        GM.getValue(id).then((data) => modifyElement(id, data));
+        GM.getValue(`${id}toggle`).then((data) => modifyElement(id, data));
+        GM.getValue(`${id}comment`).then((data) => modifyComments(id, data));
     });
 })();
 
 function modifyElement(id, data) {
     console.log(id, data);
 
-    const newElement = document.createElement('span');
-    newElement.setAttribute('data-id', id);
+    const isViewedMarkElement = document.createElement('div');
+    isViewedMarkElement.setAttribute('data-id', id);
 
     if (data !== 'VISIBLE' && data !== 'HIDDEN') {
-        newElement.setAttribute('data-data', 'VISIBLE');
-        GM.setValue(id, 'VISIBLE').then();
+        isViewedMarkElement.setAttribute('data-data', 'VISIBLE');
+        GM.setValue(`${id}toggle`, 'VISIBLE').then();
 
     } else {
-        newElement.setAttribute('data-data', data);
+        isViewedMarkElement.setAttribute('data-data', data);
     }
 
-    newElement.addEventListener('click', toggleVisible);
-    newElement.innerText = getText(data);
+    isViewedMarkElement.addEventListener('click', toggleVisible);
+    isViewedMarkElement.innerText = getText(data);
 
     const parent = document.querySelector(`#${id} .tdm_09`);
-    parent.appendChild(newElement);
-    parent.parentElement.style.opacity = getOpacity(data);    
+    parent.appendChild(isViewedMarkElement);
+    parent.parentElement.style.opacity = getOpacity(data);
+    parent.style.wordBreak = 'break-all';
 }
 
 function toggleVisible(event) {
@@ -51,12 +53,41 @@ function toggleVisible(event) {
     const data = element.getAttribute('data-data');
     const newData = getInvertedData(data);
     element.setAttribute('data-data', newData);
-    GM.setValue(id, newData)
-        .then(() => GM.getValue(id))
+
+    GM.setValue(`${id}toggle`, newData)
+        .then(() => GM.getValue(`${id}toggle`))
         .then((data) => {
-            console.log(id, data);
             element.innerText = getText(data);
             document.querySelector(`#${id} .tdm_09`).parentElement.style.opacity = getOpacity(data);
+        })
+}
+
+function modifyComments(id, data) {
+    const commentElement = document.createElement('div');
+    commentElement.setAttribute('data-id', id);
+
+    commentElement.addEventListener('click', askComment);
+    commentElement.innerText = data ? data : '[нет]';
+
+    const parent = document.querySelector(`#${id} .tdm_09`);
+    parent.appendChild(commentElement);
+}
+
+function askComment(event) {
+    const text = prompt('Введите комментарий');
+
+    if (!text) {
+        return;
+    }
+
+    const element = event.target;
+    const id = element.getAttribute('data-id');
+    element.setAttribute('data-comment', text);
+
+    GM.setValue(`${id}comment`, text)
+        .then(() => GM.getValue(`${id}comment`))
+        .then((text) => {
+            element.innerText = text;
         })
 }
 
