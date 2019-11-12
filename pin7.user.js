@@ -53,7 +53,7 @@ function modifyElement(id, data) {
         document.querySelector(`#${id} .tdm_01`).style.backgroundColor = '#FFF1F0';
     }
 
-    const undergroundRule = new RegExp('((\\d{2,3}\\sм)|([12]\\sкм)|(1\\.\\d\\sкм)).?$', 'gm');
+    const undergroundRule = new RegExp('((\\s\\d{2,3}\\sм)|(\\s[12]\\sкм)|(\\s1\\.\\d\\sкм)).?$', 'gm');
     const isOkUnderground = undergroundRule.test(document.querySelector(`#${id} .tdm_03`).innerText);
     if (!isOkUnderground) {
         document.querySelector(`#${id} .tdm_03`).style.backgroundColor = '#FFF1F0';
