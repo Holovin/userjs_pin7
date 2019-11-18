@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pin7Marker
 // @namespace    http://holov.in/Pin7Marker
-// @version      0.3
+// @version      0.31
 // @description  Userjs for mark viewed rows
 // @author       Alexander Holovin
 // @match        http://pin7.ru/*
@@ -94,6 +94,10 @@ function modifyComments(id, data) {
 
     const parent = document.querySelector(`#${id} .tdm_09`);
     parent.appendChild(commentElement);
+
+    if (data) {
+        parent.style.backgroundColor = '#C1FFDA';
+    }
 }
 
 function askComment(event) {
